@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Sport Tweets</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css"></link>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Sport Tweets</a>
+        </div>
+
+        <ul class="nav navbar-nav navbar-right">
+            <button type="button" class="btn btn-primary btn-lg" id="showAll">
+                Show All
+            </button>
+            <button type="button" class="btn btn-primary btn-lg" id="streamButton">
+                Start Stream
+            </button>
+            <button type="button" class="btn btn-primary btn-lg" id="showFilteredButton">
+                Apply Filters
+            </button>
+            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#filtersModal">
+                Settings
+            </button>
+        </ul>
+    </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+<div class="modal fade" id="filtersModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title settingHeading">Settings</h4>
+            </div>
+
+            <div class="modal-body">
+                <form id="filterForm">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="ch1">Radius for GeoSearch</label>
+                            <div class="radio">
+                                <label><input type="radio" name="optradio" value="1">1</label>
+                            </div>
+                            <div class="radio">
+                                <label><input type="radio" name="optradio" value="10" >10</label>
+                            </div>
+                            <div class="radio">
+                                <label><input type="radio" name="optradio" value="100">100</label>
+                            </div>
+                            <div class="radio">
+                                <label><input type="radio" name="optradio" value="1000">1000</label>
+                            </div>
+                            <div class="radio">
+                                <label><input type="radio" name="optradio" value="5000" checked>5000</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="ch1">Filters</label>
+                            <p>The tweets must include a keyword to be shown.</p>
+                            <div>
+                                <input type="checkbox" name="soccer" value="soccer" id="soccerCheck" checked>
+                                <label for="ch1">soccer</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" name="football" value="football" id="basketBallCheck" checked>
+                                <label for="ch1">football</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" name="basketball" value="basketball" id="footballCheck" checked>
+                                <label for="ch1">basketball</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h4 class="settingHeading">Instructions</h4>
+                        <hr></hr>
+                        <div class="col-sm-6">
+                            <ul>
+                                <li>
+                                    Changes in settings are automatically saved.
+                                </li>
+                                <li>
+                                    Turning on a filter includes that sport.
+                                </li>
+                                </ul>
+                        </div>
+                        <div class="col-sm-6">
+                            <ul>
+                                <li>
+                                    Right-click for geo-search.
+                                </li>
+                                <li>
+                                    Can apply filters after show all or streaming.
+                                </li>
+                                </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="map"></div>
+
+<script src="/static/js/main.js"></script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAAVUKgc7zGhALvM8CEDOyxjhaajwqq9uc">
+</script>
+
+
+
+</body>
+
+
+</html>
