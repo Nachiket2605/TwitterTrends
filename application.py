@@ -3,14 +3,15 @@ from flask import Flask
 import certifi
 from elasticsearch import Elasticsearch
 import secretsAndSettings as sas
+from pykafka import KafkaClient
+
+
 index = "geo-tweets"
 #elasticsearch set up
+
 elasticsearch = Elasticsearch(sas.elasticSearch['uri'],
                               port=sas.elasticSearch['port'],
                               use_ssl=sas.elasticSearch['use_ssl'])
-
-
-
 
 application = Flask(__name__)
 
@@ -20,8 +21,6 @@ def getSimplifiedTweets(query):
     resSources = list(map(getSource, res['hits']['hits']))
     simplifiedTweets = []
     username = None
-
-
     for tweet in resSources:
         if (tweet['user']):
             if (tweet['user']['name']):
