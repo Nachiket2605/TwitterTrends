@@ -18,7 +18,7 @@ elasticsearch = Elasticsearch(sas.elasticSearch['uri'],
                               use_ssl=sas.elasticSearch['use_ssl'])
 
 #tracked workds
-wordsToTrack = ['Baseball', 'Football', 'Darts', 'Soccer', 'Basketball']
+wordsToTrack = ['Baseball', 'Football', 'Darts', 'Soccer', 'Basketball', 'Cricket']
 def lowerCase(word): return str(word).lower()
 wordsToTrack.extend(map(lowerCase, wordsToTrack))
 
@@ -30,6 +30,7 @@ if  elasticsearch.indices.exists(geoTweetIndexName):
 elasticsearch.indices.create(index=geoTweetIndexName,
                                     ignore=400,
                                     body=gts.geoTweetsSettings)
+
 
 def getGeoCode(tweet):
     try:
@@ -78,6 +79,8 @@ class ElasticSearchFeederStreamListener(tweepy.StreamListener):
         try:
             tweet = json.loads(tweet_data)
             tweet["location"] = getGeoCode(tweet)
+
+
             print (elasticsearch.index(index=geoTweetIndexName, doc_type="tweet", body=tweet))
             ElasticSearchFeederStreamListener.count += 1
             # if (ElasticSearchFeederStreamListener.count > 100):

@@ -1,4 +1,5 @@
 from credentials import aws_key, aws_id, aws_region, sqs_name, arn
+import secretsAndSettings as sas
 from time import sleep
 import json
 import boto.sqs

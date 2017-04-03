@@ -15,8 +15,8 @@ api = tweepy.API(auth)
 
 
 
-conf = {"sqs-access-key": "AKIAJN3ACGV3J6SG3Q5A",
-        "sqs-secret-key": "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",
+conf = {"sqs-access-key": "",
+        "sqs-secret-key": "",
         "sqs-queue-name": "tweet_queue",
         "sqs-region": "us-east-1",
         "sqs-path": "sqssend"
@@ -32,8 +32,8 @@ conn = boto.sqs.connect_to_region(
 q = conn.get_queue('tweet_queue')
 
 wordsToTrack = ['Baseball', 'Football', 'Darts', 'Soccer', 'Basketball', 'Cricket']
-def lowerCase(word): return str(word).lower()
-wordsToTrack.extend(map(lowerCase, wordsToTrack))
+# def lowerCase(word): return str(word).lower()
+# wordsToTrack.extend(map(lowerCase, wordsToTrack))
 
 geoTweetIndexName = "geo-tweets"
 
@@ -75,12 +75,34 @@ def getGeoCode(tweet):
         return coordinatesDict
 
 class SQSStreamListener(tweepy.StreamListener):
+
+    conn = boto.sqs.connect_to_region(
+        conf.get('sqs-region'),
+        aws_access_key_id=conf.get('sqs-access-key'),
+        aws_secret_access_key=conf.get('sqs-secret-key')
+    )
+
+    q = conn.get_queue('tweet_queue')
+
+
     count = 0
     def on_data(self, tweet_data):
         try:
             tweet = json.loads(tweet_data)
             tweet["location"] = getGeoCode(tweet)
+            m = RawMessage()
+            m.set_body("Hi, how are you doing today?")
+            #m.set_body(tweet)
+            q.write(m)
+            print (m)
+        except:
+            pass
 
 
-SQSStreamListenerInstance = SQSStreamListener()
+SQSStreamListenerInstance = ()
 myStream = tweepy.Stream(auth = api.auth, listener=SQSStreamListenerInstance)
+# while (True):
+#     try:
+#         myStream.filter(track=wordsToTrack)
+#     except:
+#         continue
