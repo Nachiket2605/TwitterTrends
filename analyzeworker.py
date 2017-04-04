@@ -7,7 +7,6 @@ from boto.sqs.message import Message
 import ast
 from alchemyapi import AlchemyAPI
 from elasticsearch import Elasticsearch, RequestsHttpConnection
-#from requests_aws4auth import AWS4Auth
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
@@ -35,6 +34,21 @@ sns = boto.sns.connect_to_region("us-east-1")
 thread_pool = ThreadPoolExecutor(max_workers=4)
 
 
+
+geoTweetIndexName = "geo-tweets"
+
+
+elasticsearch = Elasticsearch(sas.elasticSearch['uri'],
+                              port=sas.elasticSearch['port'],
+                              use_ssl=sas.elasticSearch['use_ssl'])
+
+
+if  elasticsearch.indices.exists(geoTweetIndexName):
+    elasticsearch.indices.delete(index=geoTweetIndexName)
+elasticsearch.indices.create(index=geoTweetIndexName,
+                                    ignore=400,
+                                    body=gts.geoTweetsSettings)
+
 def sentimentanalyze(m):
     error = False
     body = m.get_body()
@@ -49,16 +63,17 @@ def sentimentanalyze(m):
         tweet['sentiment'] = response["docSentiment"]["type"]
         print("Sentiment: "+ tweet['sentiment'])
 
-        #add to Elasticsearch
-        # try:
-        #     self.es.index(index="tweets", doc_type="twitter_twp", body=tweet)
-        # except Exception as e:
+        index = "geo-tweets"
+        try:
+            elasticsearch.index(index="geo-tweets", doc_type="tweet", body=tweet)
+        except Exception as e:
+            pass
         #     print('Elasticserch indexing failed')
         #     print(e)
 
 
         json_string = json.dumps(tweet)
-        #send processed tweet to SNS
+
         sns.publish(sas.arn['arn'], json_string, subject='TwitterStream')
 
         #delete notification when done
