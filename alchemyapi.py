@@ -143,8 +143,8 @@ class AlchemyAPI:
         import sys
         try:
             # Open the key file and read the key
-            f = open("api_key.txt", "r")
-            key = f.read().strip()
+            #f = open("api_key.txt", "r")
+            key = "630d48bd9a8c41839f20b2d3bf910ef8dbc7e0cf"
 
             if key == '':
                 # The key file should't be blank
