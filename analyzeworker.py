@@ -64,13 +64,15 @@ def sentimentanalyze(m):
     if not error:
         tweet['sentiment'] = response["docSentiment"]["type"]
         print("Sentiment: "+ tweet['sentiment'])
-
+        print ('--------------------------------------')
+        print (tweet)
         index = "geo-tweets"
-        # try:
-        #     elasticsearch.index(index="geo-tweets", doc_type="tweet", body=tweet)
-        #     print (elasticsearch.index(index="geo-tweets", doc_type="tweet", body=tweet))
-        # except Exception as e:
-        #     pass
+        try:
+            elasticsearch.index(index="geo-tweets", doc_type="tweet", body=tweet)
+            print (elasticsearch.index(index="geo-tweets", doc_type="tweet", body=tweet))
+        except Exception as e:
+            print ("Could not index this shit")
+            pass
 
 
 
