@@ -38,16 +38,17 @@ thread_pool = ThreadPoolExecutor(max_workers=4)
 geoTweetIndexName = "geo-tweets"
 
 
+#elasticsearch = Elasticsearch({'host': 'search-es-twitter-yarekxa5djp3rkj7kp735gvacy.us-west-2.es.amazonaws.com', 'port': 443})
 elasticsearch = Elasticsearch(sas.elasticSearch['uri'],
                               port=sas.elasticSearch['port'],
                               use_ssl=sas.elasticSearch['use_ssl'])
 
 
-if  elasticsearch.indices.exists(geoTweetIndexName):
-    elasticsearch.indices.delete(index=geoTweetIndexName)
-elasticsearch.indices.create(index=geoTweetIndexName,
-                                    ignore=400,
-                                    body=gts.geoTweetsSettings)
+# if  elasticsearch.indices.exists(geoTweetIndexName):
+#     elasticsearch.indices.delete(index=geoTweetIndexName)
+# elasticsearch.indices.create(index=geoTweetIndexName,
+#                                     ignore=400,
+#                                     body=gts.geoTweetsSettings)
 
 def sentimentanalyze(m):
     error = False
@@ -56,20 +57,21 @@ def sentimentanalyze(m):
 
     print(tweet['text'])
     response = alchemy.sentiment("text", tweet['text'])
+    print (response)
     if(response['status']=='ERROR'):
         print('ERROR')
-        error = True
+        #error = True
     if not error:
         tweet['sentiment'] = response["docSentiment"]["type"]
         print("Sentiment: "+ tweet['sentiment'])
 
         index = "geo-tweets"
-        try:
-            elasticsearch.index(index="geo-tweets", doc_type="tweet", body=tweet)
-        except Exception as e:
-            pass
-        #     print('Elasticserch indexing failed')
-        #     print(e)
+        # try:
+        #     elasticsearch.index(index="geo-tweets", doc_type="tweet", body=tweet)
+        #     print (elasticsearch.index(index="geo-tweets", doc_type="tweet", body=tweet))
+        # except Exception as e:
+        #     pass
+
 
 
         json_string = json.dumps(tweet)

@@ -10,7 +10,7 @@ index = "geo-tweets"
 #elasticsearch set up
 
 elasticsearch = Elasticsearch(sas.elasticSearch['uri'],
-                              port=sas.elasticSearch['port'],
+                              port=9200,
                               use_ssl=sas.elasticSearch['use_ssl'])
 
 application = Flask(__name__)
@@ -34,6 +34,7 @@ def getSimplifiedTweets(query):
                 'long' : tweet['location']['lon']
             },
             'text': tweet['text'],
+            'sentiment': tweet['sentiment']
         }
         if (username):
             simplifiedTweet['user'] = username
@@ -115,7 +116,7 @@ def searchTweetsByGeoLocation():
 
 @application.route('/unformattedTweets')
 def getAllTweetsUnformatted():
-    res = elasticsearch.search(index=index, size=20, body={"query": {"match_all": {}}})
+    res = elasticsearch.search(index=index, size=40, body={"query": {"match_all": {}}})
     def getSource(result): return result['_source']
     resSources = list(map(getSource, res['hits']['hits']))
     print("returning " + str(len(resSources)) + " tweets.")
