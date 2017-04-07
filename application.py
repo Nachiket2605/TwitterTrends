@@ -10,13 +10,13 @@ index = "geo-tweets"
 #elasticsearch set up
 
 elasticsearch = Elasticsearch(sas.elasticSearch['uri'],
-                              port=9200,
+                              port=sas.elasticSearch['port'],
                               use_ssl=sas.elasticSearch['use_ssl'])
 
 application = Flask(__name__)
 
 def getSimplifiedTweets(query):
-    res = elasticsearch.search(index=index, doc_type="tweet", size=40, body=query)
+    res = elasticsearch.search(index=index, doc_type="tweet", size=500, body=query)
     def getSource(result): return result['_source']
     resSources = list(map(getSource, res['hits']['hits']))
     simplifiedTweets = []
@@ -65,6 +65,32 @@ def getTweets():
     }
     simplifiedTweets = getSimplifiedTweets(query)
     return jsonify(simplifiedTweets)
+
+
+@application.route('/search/sns', methods = ['GET', 'POST', 'PUT'])
+def snsFunction():
+    try:
+        notification = json.loads(request.data)
+    except:
+        print("Unable to load request")
+        pass
+
+    headers = request.headers.get('X-Amz-Sns-Message-Type')
+    print(notification)
+
+    if headers == 'SubscriptionConfirmation' and 'SubscribeURL' in notification:
+        url = requests.get(notification['SubscribeURL'])
+        print(url)
+    elif headers == 'Notification':
+        getSimplifiedTweets(notification)
+    else:
+        print("Headers not specified")
+
+    return "OK\n"
+
+
+
+
 
 @application.route('/streamPoll', methods=['POST'])
 def streamPoll():
@@ -116,7 +142,7 @@ def searchTweetsByGeoLocation():
 
 @application.route('/unformattedTweets')
 def getAllTweetsUnformatted():
-    res = elasticsearch.search(index=index, size=40, body={"query": {"match_all": {}}})
+    res = elasticsearch.search(index=index, size = 500, body={"query": {"match_all": {}}})
     def getSource(result): return result['_source']
     resSources = list(map(getSource, res['hits']['hits']))
     print("returning " + str(len(resSources)) + " tweets.")

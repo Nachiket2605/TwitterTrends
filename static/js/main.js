@@ -7,15 +7,18 @@ var streaming = false;
 var intervalId = null;
 class GeoTweet {
     constructor(data) {
+      console.log("geotweet onstructor");
         this.user = data.user;
         this.text = data.text;
+        this.sentiment = data.sentiment;
         this.coordinates = {"lat": Number(data.coordinates["lat"]),
             "lng": Number(data.coordinates["long"])};
     }
 
     get formattedContent() {
         var fc = "<div><p>"+this.text+
-            "</p><h5>"+this.user+"</h5></div>";
+            "</p><h5>"+this.user+"</h5><a>"+this.sentiment+"</a></div>";
+            console.log("fc: "+fc);
         return fc;
     }
 
@@ -68,7 +71,8 @@ function initGoogleMapDisplay() {
             data: {
                 "lat" : event.latLng.lat(),
                 "lng" : event.latLng.lng(),
-                "distance" : distance
+                "distance" : distance,
+
             },
             success: function(tweetData) {
                  geoTweets = tweetData.map(function(tweetData) {
@@ -101,6 +105,7 @@ function streamPoll() {
 
 
 function getTweets(useFilters) {
+  console.log("get tweets");
     return $.ajax({
         type: "GET",
         url: "/tweets",
@@ -154,5 +159,6 @@ $(document).ready(function() {
     initGoogleMapDisplay();
     getFilters($('#filterForm').serializeArray());
     getTweets(true);
+    console.log("test log");
     console.log("done with init");
 });

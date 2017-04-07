@@ -31,6 +31,7 @@ q = conn.get_queue('tweet_queue')
 alchemy = AlchemyAPI()
 sns = boto.sns.connect_to_region("us-east-1")
 
+
 thread_pool = ThreadPoolExecutor(max_workers=4)
 
 
@@ -55,7 +56,7 @@ def sentimentanalyze(m):
     body = m.get_body()
     tweet= ast.literal_eval(body)
 
-    print(tweet['text'])
+    #print(tweet['text'])
     response = alchemy.sentiment("text", tweet['text'])
     print (response)
     if(response['status']=='ERROR'):
@@ -63,13 +64,13 @@ def sentimentanalyze(m):
         #error = True
     if not error:
         tweet['sentiment'] = response["docSentiment"]["type"]
-        print("Sentiment: "+ tweet['sentiment'])
+        #print("Sentiment: "+ tweet['sentiment'])
         print ('--------------------------------------')
-        print (tweet)
+        #print (tweet)
         index = "geo-tweets"
         try:
             elasticsearch.index(index="geo-tweets", doc_type="tweet", body=tweet)
-            print (elasticsearch.index(index="geo-tweets", doc_type="tweet", body=tweet))
+            #print (elasticsearch.index(index="geo-tweets", doc_type="tweet", body=tweet))
         except Exception as e:
             print ("Could not index this shit")
             pass
@@ -81,13 +82,13 @@ def sentimentanalyze(m):
         sns.publish(sas.arn['arn'], json_string, subject='TwitterStream')
 
         #delete notification when done
-        q.delete_message(m)
+
         print('Done')
 
 
 while (True):
     newtweet = q.get_messages()
-    print (len(newtweet))
+    #print (len(newtweet))
     if len(newtweet) > 0:
         for m in newtweet:
 	           thread_pool.submit(sentimentanalyze, m)
