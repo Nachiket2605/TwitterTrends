@@ -10,37 +10,28 @@ from alchemyapi import AlchemyAPI
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 import sys
 from concurrent.futures import ThreadPoolExecutor
-import boto3
-
-
-
-
-conf = {"sqs-access-key": sas.awsKeys['access-key'],
-        "sqs-secret-key": sas.awsKeys['secret-key'],
-        "sqs-queue-name": "tweet_queue",
-        "sqs-region": "us-east-1",
-        "sqs-path": "sqssend"
-        }
-
-conn = boto.sqs.connect_to_region(
-        conf.get('sqs-region'),
-        aws_access_key_id=conf.get('sqs-access-key'),
-        aws_secret_access_key=conf.get('sqs-secret-key')
-    )
-
-q = conn.get_queue('tweet_queue')
+from pykafka import KafkaClient
+from kafka import KafkaConsumer
 
 
 alchemy = AlchemyAPI()
 sns = boto.sns.connect_to_region("us-east-1")
 
-
-
 thread_pool = ThreadPoolExecutor(max_workers=4)
 
-
-
 geoTweetIndexName = "geo-tweets"
+
+
+client = KafkaClient(host='localhost:9092')
+
+topic = 'test'
+consumer = KafkaConsumer(topic)
+
+print ("Success")
+
+for message in consumer:
+    print (message)
+
 
 
 #elasticsearch = Elasticsearch({'host': 'search-es-twitter-yarekxa5djp3rkj7kp735gvacy.us-west-2.es.amazonaws.com', 'port': 443})
@@ -56,13 +47,14 @@ elasticsearch = Elasticsearch(sas.elasticSearch['uri'],
 #                                     body=gts.geoTweetsSettings)
 
 
-# sns.subscribe('Newtopic','http', 'http://425c9a00.ngrok.io:5000')
+#sns.subscribe('Newtopic','http', 'http://425c9a00.ngrok.io:5000')
 #
 # print (sns.subscribe('Newtopic','http', 'http://127.0.0.1:4040'))
 
 
 def sentimentanalyze(m):
     error = False
+
     body = m.get_body()
     tweet= ast.literal_eval(body)
 
@@ -96,8 +88,12 @@ def sentimentanalyze(m):
 
 
 while (True):
-    newtweet = q.get_messages()
-    #print (len(newtweet))
-    if len(newtweet) > 0:
-        for m in newtweet:
-	           thread_pool.submit(sentimentanalyze, m)
+    for message in consumer:
+        print (message)
+        #if message is not None:
+        #print(message.offset, message.value)
+        #thread_pool.submit(sentimentanalyze, message)
+
+    # if len(newtweet) > 0:
+    #     for m in newtweet:
+	#            thread_pool.submit(sentimentanalyze, m)

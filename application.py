@@ -4,6 +4,7 @@ import certifi
 from elasticsearch import Elasticsearch
 import secretsAndSettings as sas
 from pykafka import KafkaClient
+import json
 
 
 index = "geo-tweets"
@@ -67,26 +68,29 @@ def getTweets():
     return jsonify(simplifiedTweets)
 
 
-@application.route('/search/sns', methods = ['GET', 'POST', 'PUT'])
+@application.route('/sns', methods = ['GET', 'POST', 'PUT'])
 def snsFunction():
-    try:
-        notification = json.loads(request.data)
-    except:
-        print("Unable to load request")
-        pass
+    #print (request.data)
+    notification = (request.data)
+    # try:
+    #
+    # except:
+    #     print("Unable to load request")
+    #     pass
 
     headers = request.headers.get('X-Amz-Sns-Message-Type')
     print(notification)
 
     if headers == 'SubscriptionConfirmation' and 'SubscribeURL' in notification:
-        url = requests.get(notification['SubscribeURL'])
+        print (notification['SubscribeURL'])
+        url = notification['SubscribeURL']
         print(url)
     elif headers == 'Notification':
         getSimplifiedTweets(notification)
     else:
         print("Headers not specified")
 
-    return "OK\n"
+    return (notification)
 
 
 
