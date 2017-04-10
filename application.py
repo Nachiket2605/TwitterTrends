@@ -5,6 +5,9 @@ from elasticsearch import Elasticsearch
 import secretsAndSettings as sas
 from pykafka import KafkaClient
 import json
+from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect
+
+
 
 
 index = "geo-tweets"
@@ -15,6 +18,7 @@ elasticsearch = Elasticsearch(sas.elasticSearch['uri'],
                               use_ssl=sas.elasticSearch['use_ssl'])
 
 application = Flask(__name__)
+socketio = SocketIO(application)
 
 def getSimplifiedTweets(query):
     res = elasticsearch.search(index=index, doc_type="tweet", size=500, body=query)
@@ -71,15 +75,16 @@ def getTweets():
 @application.route('/sns', methods = ['GET', 'POST', 'PUT'])
 def snsFunction():
     #print (request.data)
-    notification = (request.data)
-    # try:
-    #
-    # except:
-    #     print("Unable to load request")
-    #     pass
+    #notification = (request.data)
+
+    try:
+        notification = json.loads(request.data)
+    except:
+        print("Unable to load request")
+        pass
 
     headers = request.headers.get('X-Amz-Sns-Message-Type')
-    print(notification)
+    #print(notification)
 
     if headers == 'SubscriptionConfirmation' and 'SubscribeURL' in notification:
         print (notification['SubscribeURL'])

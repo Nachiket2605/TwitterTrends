@@ -45,9 +45,15 @@ function tweetsDisplay(useFilters) {
             ///todo: make the content prettier by following the online example.
             content: geoTweet.formattedContent
         });
+        var iconBase = 'http://maps.gstatic.com/mapfiles/ridefinder-images/';
+        var icons = {
+        'positive': iconBase + 'mm_20_green.png',
+        'neutral': iconBase + 'mm_20_blue.png',
+        'negative': iconBase + 'mm_20_red.png'};
 
         var marker = new google.maps.Marker({
             position: geoTweet.coordinates,
+            icon: icons[this.sentiment],
             map: map,
             //todo: make better titles
             title: geoTweet.text.slice(1,5)
@@ -61,7 +67,7 @@ function tweetsDisplay(useFilters) {
 
 function initGoogleMapDisplay() {
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 2,
+        zoom: 4,
         center: {lat: 0., lng: 0.}
     });
     google.maps.event.addListener(map, 'rightclick', function(event) {
@@ -104,11 +110,25 @@ function streamPoll() {
 }
 
 
+// function getTweets(useFilters) {
+//   console.log("get tweets");
+//     return $.ajax({
+//         type: "GET",
+//         url: "/tweets",
+//         success: function(tweetData) {
+//             geoTweets = tweetData.map(function(tweetData) {
+//                 return new GeoTweet(tweetData)
+//             });
+//             tweetsDisplay(useFilters);
+//         }
+//     })
+// }
+
 function getTweets(useFilters) {
   console.log("get tweets");
     return $.ajax({
         type: "GET",
-        url: "/tweets",
+        url: "/sns",
         success: function(tweetData) {
             geoTweets = tweetData.map(function(tweetData) {
                 return new GeoTweet(tweetData)
@@ -117,6 +137,11 @@ function getTweets(useFilters) {
         }
     })
 }
+
+
+
+
+
 
 function getFilters(serializedArray) {
     filters =

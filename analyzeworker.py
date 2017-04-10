@@ -35,12 +35,11 @@ alchemy = AlchemyAPI()
 sns = boto.sns.connect_to_region("us-east-1")
 
 
-
 thread_pool = ThreadPoolExecutor(max_workers=4)
 
 
 
-geoTweetIndexName = "geo-tweets"
+geoTweetIndexName = "geotweets"
 
 
 #elasticsearch = Elasticsearch({'host': 'search-es-twitter-yarekxa5djp3rkj7kp735gvacy.us-west-2.es.amazonaws.com', 'port': 443})
@@ -56,7 +55,7 @@ elasticsearch = Elasticsearch(sas.elasticSearch['uri'],
 #                                     body=gts.geoTweetsSettings)
 
 
-# sns.subscribe('Newtopic','http', 'http://425c9a00.ngrok.io:5000')
+#sns.subscribe('Newtopic','http', 'http://425c9a00.ngrok.io:5000')
 #
 # print (sns.subscribe('Newtopic','http', 'http://127.0.0.1:4040'))
 
@@ -67,18 +66,23 @@ def sentimentanalyze(m):
     tweet= ast.literal_eval(body)
 
     response = alchemy.sentiment("text", tweet['text'])
+    print(response)
 
     if(response['status']=='ERROR'):
         print('ERROR')
-        #error = True
+        error = True
     if not error:
         tweet['sentiment'] = response["docSentiment"]["type"]
-        print(tweet['sentiment'])
+        json_string = json.dumps(tweet)
+
+        sns.publish(sas.arn['arn'], json_string, subject='Newtopic')
+        #print (sns.publish(sas.arn['arn'], json_string, subject='Newtopic'))
+        #print(tweet['sentiment'])
         print ('--------------------------------------')
         #print (tweet)
-        index = "geo-tweets"
+        index = "geotweets"
         try:
-            elasticsearch.index(index="geo-tweets", doc_type="tweet", body=tweet)
+            elasticsearch.index(index="geotweets", doc_type="tweet", body=tweet)
             #print (elasticsearch.index(index="geo-tweets", doc_type="tweet", body=tweet))
         except Exception as e:
             print ("Could not index this shit")
@@ -86,10 +90,7 @@ def sentimentanalyze(m):
 
 
 
-        json_string = json.dumps(tweet)
 
-        sns.publish(sas.arn['arn'], json_string, subject='Newtopic')
-        print (sns.publish(sas.arn['arn'], json_string, subject='Newtopic'))
         #delete notification when done
 
         print('Done')

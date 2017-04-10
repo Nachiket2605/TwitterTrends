@@ -13,9 +13,12 @@ auth.set_access_token(sas.twitterKeys['access_token'],
                       sas.twitterKeys['access_token_secret'])
 api = tweepy.API(auth)
 
-#client = KafkaClient(hosts="127.0.0.1:9092")
-topic = 'test'
-producer = KafkaProducer(bootstrap_servers="localhost:2181")
+client = KafkaClient(hosts="127.0.0.1:9092")
+topic = client.topics
+
+
+#topic = 'test'
+#producer = KafkaProducer(bootstrap_servers="localhost:2181")
 
 
 
@@ -73,9 +76,11 @@ class KafkaStreamListener(tweepy.StreamListener):
         try:
             tweet = json.loads(tweet_data)
             tweet["location"] = getGeoCode(tweet)
-            producer.send(topic, tweet)
-            print (producer.send(topic, tweet))
-
+            # producer.send(topic, tweet)
+            # print (producer.send(topic, tweet))
+            with topic.get_sync_producer() as producer:
+                producer.produce(tweet)
+                print (tweet)
             # with topic.get_sync_producer() as producer:
             #     producer.produce(tweet)
 

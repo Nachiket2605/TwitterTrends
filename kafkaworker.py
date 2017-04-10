@@ -22,7 +22,7 @@ thread_pool = ThreadPoolExecutor(max_workers=4)
 geoTweetIndexName = "geo-tweets"
 
 
-client = KafkaClient(host='localhost:9092')
+#client = KafkaClient(host='localhost:9092')
 
 topic = 'test'
 consumer = KafkaConsumer(topic)
